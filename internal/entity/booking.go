@@ -5,4 +5,5 @@ type Booking struct {
 	DoctorID    int64  `json:"doctor_id" gorm:"type:bigint;not null"`
 	BookingDate string `json:"booking_date" gorm:"type:varchar(255);not null"`
 	BookingTime string `json:"booking_time" gorm:"type:varchar(255);not null"`
+	Status      string `json:"status" gorm:"type:varchar(255);"`
 }
