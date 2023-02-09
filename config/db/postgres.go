@@ -18,7 +18,7 @@ func InitDB() *gorm.DB {
 		log.Error().Msgf("cant connect to database %s", err)
 	}
 
-	db.AutoMigrate(&entity.User{})
+	db.AutoMigrate(&entity.User{}, &entity.Specialties{}, &entity.Doctor{}, &entity.Pet{}, &entity.Category{}, &entity.Booking{}, &entity.Additional{})
 	fmt.Println("Database connected")
 
 	return db
