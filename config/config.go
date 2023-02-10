@@ -1,11 +1,12 @@
 package config
 
 import (
+	"database/sql"
+	"log"
 	"os"
 	"strconv"
 
 	"github.com/muhangga/config/db"
-	"gorm.io/gorm"
 )
 
 type (
@@ -16,7 +17,7 @@ type (
 		ServiceName() string
 		ServicePort() int
 		ServiceEnvironment() string
-		Database() *gorm.DB
+		Database() *sql.DB
 	}
 )
 
@@ -24,8 +25,13 @@ func NewConfig() Config {
 	return &config{}
 }
 
-func (c *config) Database() *gorm.DB {
-	return db.InitDB()
+func (c *config) Database() *sql.DB {
+	db, err := db.InitDB(true)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }
 
 func (c *config) ServiceName() string {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/muhangga/config"
+	"github.com/muhangga/config/db"
 	"github.com/muhangga/internal/app"
 )
 
@@ -15,9 +16,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	config := config.NewConfig()
-	config.Database()
+	// Load config DB
 
+	db, err := db.InitDB(true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	config := config.NewConfig()
 	server := app.InitServer(config)
 
 	wg := sync.WaitGroup{}

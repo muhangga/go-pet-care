@@ -6,6 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/muhangga/config"
+	"github.com/muhangga/internal/delivery"
+	"github.com/muhangga/internal/repository"
+	"github.com/muhangga/internal/usecase"
 )
 
 type server struct {
@@ -26,12 +29,17 @@ func InitServer(config config.Config) Server {
 
 func (s *server) Run() {
 
-	s.httpServer.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+	authRepository := repository.NewRepository(s.config.Database())
+	authUsecase := usecase.NewUserUsecase(authRepository)
+	authDelivery := delivery.NewAuthDelivery(authUsecase)
 
-	})
+	api := s.httpServer.Group("/api")
+
+	auth := api.Group("/auth")
+	{
+		auth.POST("/login", authDelivery.Login)
+		auth.POST("/register", authDelivery.Register)
+	}
 
 	if err := s.httpServer.Run(":" + strconv.Itoa(s.config.ServicePort())); err != nil {
 		log.Panic(err)
