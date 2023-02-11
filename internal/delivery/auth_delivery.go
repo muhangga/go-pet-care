@@ -52,10 +52,13 @@ func (a *authDelivery) Register(c *gin.Context) {
 
 	user, err := a.authUsecase.Register(registerRequest)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, formatter)
 		return
 	}
 
-	response := utils.SuccessResponse("Account has been registered", http.StatusOK, user)
+	formatter := utils.UserFormatter(user)
+
+	response := utils.SuccessResponse("Account has been registered", http.StatusOK, formatter)
 	c.JSON(http.StatusOK, response)
 }

@@ -22,7 +22,7 @@ func SuccessResponse(message string, code int, data interface{}) successJSON {
 	meta := Meta{
 		Message: message,
 		Code:    code,
-		Status:  "Success",
+		Status:  "success",
 	}
 
 	res := successJSON{
@@ -36,7 +36,7 @@ func ErrorResponse(message string, code int, data interface{}) errorJSON {
 	meta := Meta{
 		Message: message,
 		Code:    code,
-		Status:  "Failed",
+		Status:  "failed",
 	}
 
 	res := errorJSON{

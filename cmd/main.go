@@ -17,7 +17,6 @@ func main() {
 	}
 
 	// Load config DB
-
 	db, err := db.InitDB(true)
 	if err != nil {
 		log.Fatal(err)

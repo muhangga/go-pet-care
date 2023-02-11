@@ -7,7 +7,7 @@ import (
 )
 
 type AuthRepository interface {
-	Save(entity.User) (entity.User, error)
+	Save(user entity.User) (entity.User, error)
 	FindByEmail(email string) (entity.User, error)
 	FindByID(id int64) (entity.User, error)
 }

@@ -17,35 +17,29 @@ func (r *repository) Save(u entity.User) (entity.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
 	defer cancel()
 
-	var user entity.User
-
 	_, err := r.db.ExecContext(ctx, sqlStmt, u.FullName, u.Email, u.Password, u.Role, u.CreatedAt, u.UpdatedAt)
 
 	if err != nil {
-		return user, err
+		return u, err
 	}
 
-	sqlStmt = `SELECT * FROM public.users ORDER BY id DESC LIMIT 1`
+	sqlStmt = "SELECT id, full_name, email, role, created_at, updated_at FROM users ORDER BY id DESC LIMIT 1"
 
-	err = r.db.QueryRowContext(ctx, sqlStmt).Scan(
-		&user.ID,
-		&user.FullName,
-		&user.Email,
-		&user.Password,
-		&user.PhoneNumber,
-		&user.Gender,
-		&user.Avatar,
-		&user.AboutMe,
-		&user.Role,
-		&user.CreatedAt,
-		&user.UpdatedAt,
+	row := r.db.QueryRowContext(ctx, sqlStmt)
+	err = row.Scan(
+		&u.ID,
+		&u.FullName,
+		&u.Email,
+		&u.Role,
+		&u.CreatedAt,
+		&u.UpdatedAt,
 	)
 
 	if err != nil {
-		return user, err
+		return u, err
 	}
 
-	return user, nil
+	return u, nil
 }
 
 func (r *repository) FindByEmail(email string) (entity.User, error) {
