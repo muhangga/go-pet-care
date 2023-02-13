@@ -1,6 +1,7 @@
 package entity
 
 type LoginRequest struct {
+	ID       int64  `json:"id"  database:"id"` // for response
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }

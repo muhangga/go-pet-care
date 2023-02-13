@@ -20,7 +20,13 @@ type UserFormatter struct {
 	UpdatedAt   time.Time `json:"updated_at "`
 }
 
-func FormatUser(user entity.User, token string) UserFormatter {
+type LoginSuccessFormatter struct {
+	ID    int64  `json:"id"`
+	Email string `json:"email"`
+	Token string `json:"token"`
+}
+
+func FormatUser(user entity.User) UserFormatter {
 	formatter := UserFormatter{
 		ID:          user.ID,
 		FullName:    user.FullName,
@@ -33,6 +39,16 @@ func FormatUser(user entity.User, token string) UserFormatter {
 		Role:        user.Role,
 		CreatedAt:   user.CreatedAt,
 		UpdatedAt:   user.UpdatedAt,
+	}
+
+	return formatter
+}
+
+func FormatLoginSuccess(user entity.User, token string) LoginSuccessFormatter {
+	formatter := LoginSuccessFormatter{
+		ID:    user.ID,
+		Email: user.Email,
+		Token: token,
 	}
 
 	return formatter

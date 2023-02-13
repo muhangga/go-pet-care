@@ -7,6 +7,7 @@ import (
 	"github.com/muhangga/internal/entity"
 	"github.com/muhangga/internal/usecase"
 	"github.com/muhangga/internal/utils"
+	"github.com/muhangga/pkg/middleware"
 )
 
 var (
@@ -39,15 +40,19 @@ func (a *authDelivery) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	// generate token JWT
+	token, err := middleware.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		formatter := utils.ErrorResponse("Login failed", http.StatusBadRequest, err.Error())
 
-	// token, err := utils.GenerateToken(user)
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	// 	return
-	// }
+		c.JSON(http.StatusBadRequest, formatter)
+		return
+	}
 
-	// c.JSON(http.StatusOK, gin.H{"token": token})
+	loginSuccessFormatter := utils.FormatLoginSuccess(user, token)
+
+	formatter := utils.SuccessResponse("Login success", http.StatusOK, loginSuccessFormatter)
+	c.JSON(http.StatusOK, formatter)
 }
 
 func (a *authDelivery) Register(c *gin.Context) {
@@ -77,7 +82,6 @@ func (a *authDelivery) Register(c *gin.Context) {
 	}
 
 	formatter := utils.UserFormatter(user)
-
 	response := utils.SuccessResponse("Account has been registered", http.StatusOK, formatter)
 	c.JSON(http.StatusOK, response)
 }
