@@ -29,9 +29,13 @@ func InitServer(config config.Config) Server {
 
 func (s *server) Run() {
 
-	authRepository := repository.NewRepository(s.config.Database())
+	authRepository := repository.NewAuthRepository(s.config.Database())
 	authUsecase := usecase.NewUserUsecase(authRepository)
 	authDelivery := delivery.NewAuthDelivery(authUsecase)
+
+	categoryRepository := repository.NewCategoryRepository(s.config.Database())
+	categoryUsecase := usecase.NewCategoryUsecase(categoryRepository)
+	categoryDelivery := delivery.NewCategoryDelivery(categoryUsecase)
 
 	api := s.httpServer.Group("/api")
 
@@ -39,6 +43,14 @@ func (s *server) Run() {
 	{
 		auth.POST("/login", authDelivery.Login)
 		auth.POST("/register", authDelivery.Register)
+	}
+
+	category := api.Group("/category")
+	{
+		category.POST("/create", categoryDelivery.CreateCategory)
+		category.GET("/all", categoryDelivery.FetchAllCategory)
+		category.PUT("/update", categoryDelivery.UpdateCategory)
+		category.DELETE("/delete/:id", categoryDelivery.DeleteCategory)
 	}
 
 	if err := s.httpServer.Run(":" + strconv.Itoa(s.config.ServicePort())); err != nil {

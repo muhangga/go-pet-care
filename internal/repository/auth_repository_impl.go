@@ -9,7 +9,7 @@ import (
 
 var timeOut = 15 * time.Second
 
-func (r *repository) Save(u entity.User) (entity.User, error) {
+func (r *authRepository) Save(u entity.User) (entity.User, error) {
 	var sqlStmt string
 
 	sqlStmt = "INSERT INTO public.users (full_name, email, password, avatar, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7)"
@@ -43,7 +43,7 @@ func (r *repository) Save(u entity.User) (entity.User, error) {
 	return u, nil
 }
 
-func (r *repository) FindByEmail(email string) (entity.User, error) {
+func (r *authRepository) FindByEmail(email string) (entity.User, error) {
 	var user entity.User
 
 	queryStmt := `SELECT id, full_name, email, password, role, created_at, updated_at FROM public.users WHERE email = $1`
@@ -67,7 +67,7 @@ func (r *repository) FindByEmail(email string) (entity.User, error) {
 	return user, nil
 }
 
-func (r *repository) FindByID(id int64) (entity.User, error) {
+func (r *authRepository) FindByID(id int64) (entity.User, error) {
 	var user entity.User
 
 	queryStmt := `SELECT * FROM public.users WHERE id = $1`

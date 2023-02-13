@@ -12,10 +12,10 @@ type AuthRepository interface {
 	FindByID(id int64) (entity.User, error)
 }
 
-type repository struct {
+type authRepository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) *repository {
-	return &repository{db}
+func NewAuthRepository(db *sql.DB) *authRepository {
+	return &authRepository{db}
 }

@@ -10,10 +10,6 @@ import (
 	"github.com/muhangga/pkg/middleware"
 )
 
-var (
-	errorMessage interface{}
-)
-
 type authDelivery struct {
 	authUsecase usecase.AuthUsecase
 }
