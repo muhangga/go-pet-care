@@ -9,6 +9,10 @@ import (
 	"github.com/muhangga/internal/utils"
 )
 
+var (
+	errorMessage interface{}
+)
+
 type authDelivery struct {
 	authUsecase usecase.AuthUsecase
 }
@@ -21,13 +25,17 @@ func (a *authDelivery) Login(c *gin.Context) {
 	var loginRequest entity.LoginRequest
 
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		formatter := utils.ErrorResponse("Login failed", http.StatusBadRequest, err.Error())
+
+		c.JSON(http.StatusBadRequest, formatter)
 		return
 	}
 
 	user, err := a.authUsecase.Login(loginRequest)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		formatter := utils.ErrorResponse("Login failed", http.StatusBadRequest, err.Error())
+
+		c.JSON(http.StatusBadRequest, formatter)
 		return
 	}
 
@@ -46,7 +54,17 @@ func (a *authDelivery) Register(c *gin.Context) {
 	var registerRequest entity.RegisterRequest
 
 	if err := c.ShouldBindJSON(&registerRequest); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errorMessage := gin.H{"errors": err.Error()}
+		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, errorMessage)
+		c.JSON(http.StatusBadRequest, formatter)
+		return
+	}
+
+	ok, _ := a.authUsecase.CheckEmailExist(registerRequest)
+	if ok {
+		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, "email already exist")
+		c.JSON(http.StatusBadRequest, formatter)
+
 		return
 	}
 
@@ -54,6 +72,7 @@ func (a *authDelivery) Register(c *gin.Context) {
 	if err != nil {
 		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, err.Error())
 		c.JSON(http.StatusBadRequest, formatter)
+
 		return
 	}
 

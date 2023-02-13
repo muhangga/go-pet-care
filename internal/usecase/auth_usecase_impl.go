@@ -12,26 +12,46 @@ func (a *authUsecase) Login(r entity.LoginRequest) (entity.User, error) {
 	email := r.Email
 	password := r.Password
 
+	if email == "" {
+		return entity.User{}, errors.New("email is required")
+	}
+
+	if password == "" {
+		return entity.User{}, errors.New("password is required")
+	}
+
 	user, err := a.authRepository.FindByEmail(email)
+	if err != nil {
+		return user, errors.New("email not found")
+	}
+
+	err = utils.ComparePassword(user.Password, password)
 	if err != nil {
 		return user, err
 	}
-
-	// if user.ID == sql.NullInt64{ false} {
-	// 	return user, errors.New("email not found")
-	// }
-
-	matches := utils.ComparePassword(password, user.Password)
-	if !matches {
-		return user, errors.New("invalid password")
-	}
-
 	return user, nil
 }
 
 func (a *authUsecase) Register(r entity.RegisterRequest) (entity.User, error) {
 
 	user := entity.User{}
+
+	if r.FullName == "" {
+		return user, errors.New("full name is required")
+	}
+
+	if r.Email == "" {
+		return user, errors.New("email is required")
+	}
+
+	if r.Password == "" {
+		return user, errors.New("password is required")
+	}
+
+	if len(r.Password) < 6 {
+		return user, errors.New("password must be 6 characters")
+	}
+
 	user.FullName = r.FullName
 	user.Email = r.Email
 
@@ -40,18 +60,10 @@ func (a *authUsecase) Register(r entity.RegisterRequest) (entity.User, error) {
 		return user, err
 	}
 	user.Password = passwordHash
+	user.Avatar = "avatar.jpg"
 	user.Role = "user"
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-
-	// valid, err := a.authRepository.FindByEmail(user.Email)
-	// if err != nil {
-	// 	return user, err
-	// }
-
-	// if valid.ID != 0 {
-	// 	return user, errors.New("email already exists")
-	// }
 
 	user, err = a.authRepository.Save(user)
 	if err != nil {
@@ -59,4 +71,19 @@ func (a *authUsecase) Register(r entity.RegisterRequest) (entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (a *authUsecase) CheckEmailExist(emailReq entity.RegisterRequest) (bool, error) {
+	email := emailReq.Email
+
+	user, err := a.authRepository.FindByEmail(email)
+	if err != nil {
+		return false, err
+	}
+
+	if user.ID == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }

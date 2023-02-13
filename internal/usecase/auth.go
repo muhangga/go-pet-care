@@ -8,6 +8,7 @@ import (
 type AuthUsecase interface {
 	Login(r entity.LoginRequest) (entity.User, error)
 	Register(r entity.RegisterRequest) (entity.User, error)
+	CheckEmailExist(emailReq entity.RegisterRequest) (bool, error)
 }
 
 type authUsecase struct {

@@ -1,6 +1,11 @@
 package utils
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 func GeneratePassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -11,10 +16,14 @@ func GeneratePassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func ComparePassword(password, hash string) bool {
-	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
-		return false
+func ComparePassword(password, hash string) error {
+	if password == "" {
+		return fmt.Errorf("password is required")
 	}
 
-	return true
+	if err := bcrypt.CompareHashAndPassword([]byte(password), []byte(hash)); err != nil {
+		return errors.New("invalid password")
+	}
+
+	return nil
 }
