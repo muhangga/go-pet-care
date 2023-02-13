@@ -30,7 +30,11 @@ func (u *categoryUsecase) Save(c entity.CategoryRequest) (entity.Category, error
 }
 
 func (u *categoryUsecase) FindAll() ([]entity.Category, error) {
-	return u.categoryRepository.FindAll()
+	category, err := u.categoryRepository.FindAll()
+	if err != nil {
+		return nil, errors.New("error when find all category")
+	}
+	return category, nil
 }
 
 func (u *categoryUsecase) Update(c entity.CategoryRequest) (entity.Category, error) {
@@ -56,5 +60,8 @@ func (u *categoryUsecase) Update(c entity.CategoryRequest) (entity.Category, err
 }
 
 func (u *categoryUsecase) Delete(id int64) error {
-	return u.categoryRepository.Delete(id)
+	if err := u.categoryRepository.Delete(id); err != nil {
+		return errors.New("error when delete category")
+	}
+	return nil
 }

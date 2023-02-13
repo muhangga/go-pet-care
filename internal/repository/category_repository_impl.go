@@ -6,7 +6,7 @@ import (
 	"github.com/muhangga/internal/entity"
 )
 
-func (r categoryRepository) Save(c entity.Category) (entity.Category, error) {
+func (r *categoryRepository) Save(c entity.Category) (entity.Category, error) {
 	sqlStmt := `INSERT INTO categories (name, icon) VALUES ($1, $2)`
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
@@ -34,7 +34,7 @@ func (r categoryRepository) Save(c entity.Category) (entity.Category, error) {
 	return c, nil
 }
 
-func (r categoryRepository) FindAll() ([]entity.Category, error) {
+func (r *categoryRepository) FindAll() ([]entity.Category, error) {
 	sqlStmt := `SELECT id, name, icon FROM categories`
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
@@ -66,7 +66,7 @@ func (r categoryRepository) FindAll() ([]entity.Category, error) {
 
 }
 
-func (r categoryRepository) Update(c entity.Category) (entity.Category, error) {
+func (r *categoryRepository) Update(c entity.Category) (entity.Category, error) {
 	sqlStmt := `UPDATE categories SET name = $1, icon = $2, updated_at = $3 WHERE id = $4`
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
@@ -94,7 +94,7 @@ func (r categoryRepository) Update(c entity.Category) (entity.Category, error) {
 	return c, nil
 }
 
-func (r categoryRepository) Delete(id int64) error {
+func (r *categoryRepository) Delete(id int64) error {
 	sqlStmt := `DELETE FROM categories WHERE id = $1`
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)

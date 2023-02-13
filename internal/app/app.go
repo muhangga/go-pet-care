@@ -37,6 +37,10 @@ func (s *server) Run() {
 	categoryUsecase := usecase.NewCategoryUsecase(categoryRepository)
 	categoryDelivery := delivery.NewCategoryDelivery(categoryUsecase)
 
+	specialtiesRepository := repository.NewSpecialtiesRepository(s.config.Database())
+	specialtiesUsecase := usecase.NewSpecialtiesUsecase(specialtiesRepository)
+	specialtiesDelivery := delivery.NewSpecialtiesDelivery(specialtiesUsecase)
+
 	api := s.httpServer.Group("/api")
 
 	auth := api.Group("/auth")
@@ -51,6 +55,12 @@ func (s *server) Run() {
 		category.GET("/all", categoryDelivery.FetchAllCategory)
 		category.PUT("/update", categoryDelivery.UpdateCategory)
 		category.DELETE("/delete/:id", categoryDelivery.DeleteCategory)
+	}
+
+	specialties := api.Group("/specialties")
+	{
+		specialties.POST("/create", specialtiesDelivery.CreateSpecialties)
+		specialties.GET("/all", specialtiesDelivery.FetchAllSpecialties)
 	}
 
 	if err := s.httpServer.Run(":" + strconv.Itoa(s.config.ServicePort())); err != nil {
