@@ -61,8 +61,8 @@ func (a *authDelivery) Register(c *gin.Context) {
 		return
 	}
 
-	ok, _ := a.authUsecase.CheckEmailExist(registerRequest)
-	if ok {
+	isExist, _ := a.authUsecase.CheckEmailExist(registerRequest)
+	if isExist {
 		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, "email already exist")
 		c.JSON(http.StatusBadRequest, formatter)
 
