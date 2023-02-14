@@ -7,6 +7,8 @@ import (
 
 type PetUsecase interface {
 	SavePetAdditional(u entity.PetRequest) (entity.Pet, error)
+	FindByID(id int64) (entity.Pet, error)
+	GetAllPet() ([]entity.Pet, error)
 }
 
 type petUsecase struct {

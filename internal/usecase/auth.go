@@ -15,7 +15,7 @@ type authUsecase struct {
 	authRepository repository.AuthRepository
 }
 
-func NewUserUsecase(authRepository repository.AuthRepository) *authUsecase {
+func NewAuthUsecase(authRepository repository.AuthRepository) *authUsecase {
 	return &authUsecase{
 		authRepository: authRepository,
 	}

@@ -40,3 +40,22 @@ func (u *petUsecase) SavePetAdditional(req entity.PetRequest) (entity.Pet, error
 
 	return save, nil
 }
+
+func (u *petUsecase) GetAllPet() ([]entity.Pet, error) {
+	pet, err := u.petRepository.GetAll()
+	if err != nil {
+		return pet, err
+	}
+	return pet, nil
+}
+func (u *petUsecase) FindByID(id int64) (entity.Pet, error) {
+	if id == 0 {
+		return entity.Pet{}, errors.New("ID not found")
+	}
+
+	petID, err := u.petRepository.FindPetByID(id)
+	if err != nil {
+		return petID, err
+	}
+	return petID, nil
+}

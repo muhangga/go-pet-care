@@ -1,9 +1,14 @@
 package middleware
 
 import (
+	"net/http"
 	"strings"
 
+	// "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/muhangga/internal/usecase"
+	"github.com/muhangga/internal/utils"
 )
 
 type middleware struct{}
@@ -30,16 +35,18 @@ func (m *middleware) CORS() gin.HandlerFunc {
 	}
 }
 
-func (m *middleware) JWTMiddleware() gin.HandlerFunc {
+func (m *middleware) JWTMiddleware(userUsecase usecase.UserUsecase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
+			formatter := utils.ErrorResponse("Unauthorized", http.StatusUnauthorized, nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, formatter)
 			return
 		}
 
 		if !strings.Contains(token, "Bearer") {
-			c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
+			formatter := utils.ErrorResponse("Unauthorized", http.StatusUnauthorized, nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, formatter)
 			return
 		}
 
@@ -49,13 +56,30 @@ func (m *middleware) JWTMiddleware() gin.HandlerFunc {
 			tokenStr = arrayToken[1]
 		}
 
-		claims, err := ValidateToken(tokenStr)
+		tokenValid, err := ValidateToken(tokenStr)
 		if err != nil {
-			c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
+			formatter := utils.ErrorResponse("Unauthorized", http.StatusUnauthorized, nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, formatter)
 			return
 		}
 
-		c.Set("user_id", claims)
-		c.Next()
+		claim, ok := tokenValid.Claims.(jwt.MapClaims)
+
+		if !ok || !tokenValid.Valid {
+			formatter := utils.ErrorResponse("Unauthorized2", http.StatusUnauthorized, nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, formatter)
+			return
+		}
+
+		userID := int64(claim["user_id"].(float64))
+
+		user, err := userUsecase.FindUserID(userID)
+		if err != nil {
+			formatter := utils.ErrorResponse("Unauthorized3", http.StatusUnauthorized, err.Error())
+			c.AbortWithStatusJSON(http.StatusUnauthorized, formatter)
+			return
+		}
+
+		c.Set("currentUser", user)
 	}
 }

@@ -11,10 +11,10 @@ type UserFormatter struct {
 	FullName    string    `json:"full_name"`
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
-	PhoneNumber string    `json:"phone_number"`
-	Gender      string    `json:"gender"`
+	PhoneNumber *string   `json:"phone_number"`
+	Gender      *string   `json:"gender"`
 	Avatar      string    `json:"avatar"`
-	AboutMe     string    `json:"about_me"`
+	AboutMe     *string   `json:"about_me"`
 	Role        string    `json:"role"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at "`

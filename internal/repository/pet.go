@@ -8,6 +8,8 @@ import (
 
 type PetRepository interface {
 	Save(r entity.Pet) (entity.Pet, error)
+	GetAll() ([]entity.Pet, error)
+	FindPetByID(id int64) (entity.Pet, error)
 }
 
 type petRepository struct {

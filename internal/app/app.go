@@ -1,9 +1,13 @@
 package app
 
 import (
+	"database/sql"
 	"log"
+	"os"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/muhangga/config"
 	"github.com/muhangga/internal/delivery"
@@ -28,26 +32,37 @@ func InitServer(config config.Config) Server {
 	}
 }
 
+func (s *server) DB() *sql.DB {
+	return s.config.Database()
+}
+
 func (s *server) Run() {
 
 	middleware := middleware.InitMiddleware()
 	s.httpServer.Use(middleware.CORS())
 
-	authRepository := repository.NewAuthRepository(s.config.Database())
-	authUsecase := usecase.NewUserUsecase(authRepository)
+	cookieStore := cookie.NewStore([]byte(os.Getenv("JWT_TOKEN")))
+	s.httpServer.Use(sessions.Sessions("go-pet", cookieStore))
+
+	authRepository := repository.NewAuthRepository(s.DB())
+	authUsecase := usecase.NewAuthUsecase(authRepository)
 	authDelivery := delivery.NewAuthDelivery(authUsecase)
 
-	categoryRepository := repository.NewCategoryRepository(s.config.Database())
+	categoryRepository := repository.NewCategoryRepository(s.DB())
 	categoryUsecase := usecase.NewCategoryUsecase(categoryRepository)
 	categoryDelivery := delivery.NewCategoryDelivery(categoryUsecase)
 
-	specialtiesRepository := repository.NewSpecialtiesRepository(s.config.Database())
+	specialtiesRepository := repository.NewSpecialtiesRepository(s.DB())
 	specialtiesUsecase := usecase.NewSpecialtiesUsecase(specialtiesRepository)
 	specialtiesDelivery := delivery.NewSpecialtiesDelivery(specialtiesUsecase)
 
-	petRepository := repository.NewPetRepository(s.config.Database())
+	petRepository := repository.NewPetRepository(s.DB())
 	petUsecase := usecase.NewPetUsecase(petRepository)
 	petDelivery := delivery.NewPetDelivery(petUsecase)
+
+	userRepository := repository.NewUserRepository(s.DB())
+	userUsecase := usecase.NewUserUsecase(userRepository)
+	userDelivery := delivery.NewUserDelivery(userUsecase)
 
 	api := s.httpServer.Group("/api")
 
@@ -57,7 +72,7 @@ func (s *server) Run() {
 		auth.POST("/register", authDelivery.Register)
 	}
 
-	category := api.Group("/category").Use(middleware.JWTMiddleware())
+	category := api.Group("/category").Use(middleware.JWTMiddleware(userUsecase))
 	{
 		category.POST("/create", categoryDelivery.CreateCategory)
 		category.GET("/all", categoryDelivery.FetchAllCategory)
@@ -65,15 +80,22 @@ func (s *server) Run() {
 		category.DELETE("/delete/:id", categoryDelivery.DeleteCategory)
 	}
 
-	specialties := api.Group("/specialties").Use(middleware.JWTMiddleware())
+	specialties := api.Group("/specialties").Use(middleware.JWTMiddleware(userUsecase))
 	{
 		specialties.POST("/create", specialtiesDelivery.CreateSpecialties)
 		specialties.GET("/all", specialtiesDelivery.FetchAllSpecialties)
 	}
 
-	pet := api.Group("/pet").Use(middleware.JWTMiddleware())
+	pet := api.Group("/pet").Use(middleware.JWTMiddleware(userUsecase))
 	{
 		pet.POST("/create", petDelivery.CreatePet)
+		pet.GET("/fetch", petDelivery.FetchAllPet)
+		pet.GET("/fetch/:id", petDelivery.FindPetByID)
+	}
+
+	user := api.Group("/user").Use(middleware.JWTMiddleware(userUsecase))
+	{
+		user.PUT("/update/:id", userDelivery.UpdateProfileUser)
 	}
 
 	if err := s.httpServer.Run(":" + strconv.Itoa(s.config.ServicePort())); err != nil {

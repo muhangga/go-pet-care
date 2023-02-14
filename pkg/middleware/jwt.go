@@ -10,7 +10,7 @@ import (
 
 var jwtToken = os.Getenv("JWT_TOKEN")
 
-type claims struct {
+type Claims struct {
 	ID    int64  `json:"id"`
 	Email string `json:"email"`
 	jwt.StandardClaims
@@ -19,12 +19,10 @@ type claims struct {
 func GenerateToken(id int64, email string) (string, error) {
 	expiredTime := time.Now().Add(12 * time.Hour)
 
-	claims := &claims{
-		ID:    id,
-		Email: email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiredTime.Unix(),
-		},
+	claims := jwt.MapClaims{
+		"user_id": id,
+		"email":   email,
+		"exp":     expiredTime,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

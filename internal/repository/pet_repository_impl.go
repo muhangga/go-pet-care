@@ -45,3 +45,76 @@ func (r *petRepository) Save(petReq entity.Pet) (entity.Pet, error) {
 
 	return petReq, nil
 }
+
+func (r *petRepository) GetAll() ([]entity.Pet, error) {
+	sqlStmt := `SELECT * FROM pets`
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+
+	rows, err := r.db.QueryContext(ctx, sqlStmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pets []entity.Pet
+	for rows.Next() {
+		var p entity.Pet
+		if err := rows.Scan(
+			&p.ID,
+			&p.UserID,
+			&p.PetName,
+			&p.Gender,
+			&p.DateOfBirth,
+			&p.Neureted,
+			&p.Vaccinated,
+			&p.FriendlyWithDogs,
+			&p.FriendlyWithCats,
+			&p.FriendlyWithKidsOver10,
+			&p.Microchipped,
+			&p.Purebred,
+			&p.PetNurseryName,
+			&p.CreatedAt,
+			&p.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		pets = append(pets, p)
+	}
+	return pets, nil
+}
+
+func (r *petRepository) FindPetByID(id int64) (entity.Pet, error) {
+	sqlStmt := `SELECT * FROM pets WHERE id = $1`
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
+	defer cancel()
+
+	var p entity.Pet
+
+	row := r.db.QueryRowContext(ctx, sqlStmt, id)
+	err := row.Scan(
+		&p.ID,
+		&p.UserID,
+		&p.PetName,
+		&p.Gender,
+		&p.DateOfBirth,
+		&p.Neureted,
+		&p.Vaccinated,
+		&p.FriendlyWithDogs,
+		&p.FriendlyWithCats,
+		&p.FriendlyWithKidsOver10,
+		&p.Microchipped,
+		&p.Purebred,
+		&p.PetNurseryName,
+		&p.CreatedAt,
+		&p.UpdatedAt,
+	)
+
+	if err != nil {
+		return p, err
+	}
+
+	return p, nil
+}

@@ -66,29 +66,3 @@ func (r *authRepository) FindByEmail(email string) (entity.User, error) {
 
 	return user, nil
 }
-
-func (r *authRepository) FindByID(id int64) (entity.User, error) {
-	var user entity.User
-
-	queryStmt := `SELECT * FROM public.users WHERE id = $1`
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
-	defer cancel()
-
-	if err := r.db.QueryRowContext(ctx, queryStmt, id).Scan(
-		&user.ID,
-		&user.FullName,
-		&user.Email,
-		&user.Password,
-		&user.PhoneNumber,
-		&user.Gender,
-		&user.Avatar,
-		&user.AboutMe,
-		&user.Role,
-	); err != nil {
-		return user, err
-	}
-
-	return user, nil
-
-}
