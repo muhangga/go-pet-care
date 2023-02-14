@@ -8,7 +8,7 @@ import (
 
 func (r *specialtiesRepository) FindAllSpecialties() ([]entity.Specialties, error) {
 
-	sqlStmt := `SELECT id, name, popular FROM specialties`
+	sqlStmt := `SELECT * FROM specialties`
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeOut)
 	defer cancel()
@@ -27,6 +27,8 @@ func (r *specialtiesRepository) FindAllSpecialties() ([]entity.Specialties, erro
 			&s.ID,
 			&s.Name,
 			&s.Popular,
+			&s.CreatedAt,
+			&s.UpdatedAt,
 		)
 
 		if err != nil {

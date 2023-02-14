@@ -9,6 +9,7 @@ import (
 	"github.com/muhangga/internal/delivery"
 	"github.com/muhangga/internal/repository"
 	"github.com/muhangga/internal/usecase"
+	"github.com/muhangga/pkg/middleware"
 )
 
 type server struct {
@@ -29,6 +30,9 @@ func InitServer(config config.Config) Server {
 
 func (s *server) Run() {
 
+	middleware := middleware.InitMiddleware()
+	s.httpServer.Use(middleware.CORS())
+
 	authRepository := repository.NewAuthRepository(s.config.Database())
 	authUsecase := usecase.NewUserUsecase(authRepository)
 	authDelivery := delivery.NewAuthDelivery(authUsecase)
@@ -41,6 +45,10 @@ func (s *server) Run() {
 	specialtiesUsecase := usecase.NewSpecialtiesUsecase(specialtiesRepository)
 	specialtiesDelivery := delivery.NewSpecialtiesDelivery(specialtiesUsecase)
 
+	petRepository := repository.NewPetRepository(s.config.Database())
+	petUsecase := usecase.NewPetUsecase(petRepository)
+	petDelivery := delivery.NewPetDelivery(petUsecase)
+
 	api := s.httpServer.Group("/api")
 
 	auth := api.Group("/auth")
@@ -49,7 +57,7 @@ func (s *server) Run() {
 		auth.POST("/register", authDelivery.Register)
 	}
 
-	category := api.Group("/category")
+	category := api.Group("/category").Use(middleware.JWTMiddleware())
 	{
 		category.POST("/create", categoryDelivery.CreateCategory)
 		category.GET("/all", categoryDelivery.FetchAllCategory)
@@ -57,10 +65,15 @@ func (s *server) Run() {
 		category.DELETE("/delete/:id", categoryDelivery.DeleteCategory)
 	}
 
-	specialties := api.Group("/specialties")
+	specialties := api.Group("/specialties").Use(middleware.JWTMiddleware())
 	{
 		specialties.POST("/create", specialtiesDelivery.CreateSpecialties)
 		specialties.GET("/all", specialtiesDelivery.FetchAllSpecialties)
+	}
+
+	pet := api.Group("/pet").Use(middleware.JWTMiddleware())
+	{
+		pet.POST("/create", petDelivery.CreatePet)
 	}
 
 	if err := s.httpServer.Run(":" + strconv.Itoa(s.config.ServicePort())); err != nil {

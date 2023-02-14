@@ -19,7 +19,7 @@ func NewCategoryDelivery(categoryUsecase usecase.CategoryUsecase) *categoryDeliv
 	}
 }
 
-func (h *categoryDelivery) CreateCategory(c *gin.Context) {
+func (d *categoryDelivery) CreateCategory(c *gin.Context) {
 	var categoryRequest entity.CategoryRequest
 
 	if err := c.ShouldBindJSON(&categoryRequest); err != nil {
@@ -29,7 +29,7 @@ func (h *categoryDelivery) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	category, err := h.categoryUsecase.Save(categoryRequest)
+	category, err := d.categoryUsecase.Save(categoryRequest)
 	if err != nil {
 		formatter := utils.ErrorResponse("Create category failed", http.StatusBadRequest, err.Error())
 
@@ -42,8 +42,8 @@ func (h *categoryDelivery) CreateCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, formatter)
 }
 
-func (h *categoryDelivery) FetchAllCategory(c *gin.Context) {
-	categories, err := h.categoryUsecase.FindAll()
+func (d *categoryDelivery) FetchAllCategory(c *gin.Context) {
+	categories, err := d.categoryUsecase.FindAll()
 	if err != nil {
 		formatter := utils.ErrorResponse("Failed to load category", http.StatusBadRequest, err.Error())
 
@@ -56,7 +56,7 @@ func (h *categoryDelivery) FetchAllCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, formatter)
 }
 
-func (h *categoryDelivery) UpdateCategory(c *gin.Context) {
+func (d *categoryDelivery) UpdateCategory(c *gin.Context) {
 	var categoryRequest entity.CategoryRequest
 
 	if err := c.ShouldBindJSON(&categoryRequest); err != nil {
@@ -66,7 +66,7 @@ func (h *categoryDelivery) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	category, err := h.categoryUsecase.Update(categoryRequest)
+	category, err := d.categoryUsecase.Update(categoryRequest)
 	if err != nil {
 		formatter := utils.ErrorResponse("Update category failed", http.StatusBadRequest, err.Error())
 
@@ -79,10 +79,10 @@ func (h *categoryDelivery) UpdateCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, formatter)
 }
 
-func (h *categoryDelivery) DeleteCategory(c *gin.Context) {
+func (d *categoryDelivery) DeleteCategory(c *gin.Context) {
 	id := utils.ConvertStringToInt(c.Param("id"))
 
-	err := h.categoryUsecase.Delete(id)
+	err := d.categoryUsecase.Delete(id)
 	if err != nil {
 		formatter := utils.ErrorResponse("Delete category failed", http.StatusBadRequest, err.Error())
 

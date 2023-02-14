@@ -18,7 +18,7 @@ func NewAuthDelivery(authUsecase usecase.AuthUsecase) authDelivery {
 	return authDelivery{authUsecase: authUsecase}
 }
 
-func (a *authDelivery) Login(c *gin.Context) {
+func (d *authDelivery) Login(c *gin.Context) {
 	var loginRequest entity.LoginRequest
 
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
@@ -28,7 +28,7 @@ func (a *authDelivery) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := a.authUsecase.Login(loginRequest)
+	user, err := d.authUsecase.Login(loginRequest)
 	if err != nil {
 		formatter := utils.ErrorResponse("Login failed", http.StatusBadRequest, err.Error())
 
@@ -51,7 +51,7 @@ func (a *authDelivery) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, formatter)
 }
 
-func (a *authDelivery) Register(c *gin.Context) {
+func (d *authDelivery) Register(c *gin.Context) {
 	var registerRequest entity.RegisterRequest
 
 	if err := c.ShouldBindJSON(&registerRequest); err != nil {
@@ -61,7 +61,7 @@ func (a *authDelivery) Register(c *gin.Context) {
 		return
 	}
 
-	isExist, _ := a.authUsecase.CheckEmailExist(registerRequest)
+	isExist, _ := d.authUsecase.CheckEmailExist(registerRequest)
 	if isExist {
 		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, "email already exist")
 		c.JSON(http.StatusBadRequest, formatter)
@@ -69,7 +69,7 @@ func (a *authDelivery) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := a.authUsecase.Register(registerRequest)
+	user, err := d.authUsecase.Register(registerRequest)
 	if err != nil {
 		formatter := utils.ErrorResponse("Register failed", http.StatusBadRequest, err.Error())
 		c.JSON(http.StatusBadRequest, formatter)

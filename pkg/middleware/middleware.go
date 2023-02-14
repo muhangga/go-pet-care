@@ -1,6 +1,10 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 type middleware struct{}
 
@@ -34,7 +38,18 @@ func (m *middleware) JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := ValidateToken(token)
+		if !strings.Contains(token, "Bearer") {
+			c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
+			return
+		}
+
+		tokenStr := ""
+		arrayToken := strings.Split(token, " ")
+		if len(arrayToken) == 2 {
+			tokenStr = arrayToken[1]
+		}
+
+		claims, err := ValidateToken(tokenStr)
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
 			return

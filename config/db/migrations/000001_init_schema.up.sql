@@ -14,10 +14,17 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS pets (
     id bigserial PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    additional_id BIGINT NOT NULL,
     pet_name VARCHAR(255) NOT NULL,
     gender VARCHAR(255) NOT NULL,
     date_of_birth DATE NOT NULL,
+    neureted BOOLEAN NOT NULL,
+    vaccinated BOOLEAN NOT NULL,
+    friendly_with_dogs BOOLEAN NOT NULL,
+    friendly_with_cats BOOLEAN NOT NULL,
+    friendly_with_kids BOOLEAN NOT NULL,
+    microchipped BOOLEAN NOT NULL,
+    purebred BOOLEAN NOT NULL,
+    pet_nursery_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -53,16 +60,4 @@ CREATE TABLE IF NOT EXISTS booking (
     booking_date DATE NOT NULL,
     booking_time TIME NOT NULL,
     status VARCHAR(255) NOT NULL
-);
-CREATE TABLE IF NOT EXISTS additionals (
-    id SERIAL PRIMARY KEY,
-    pet_id BIGINT NOT NULL,
-    neureted BOOLEAN NOT NULL,
-    vaccinated BOOLEAN NOT NULL,
-    friendly_with_dogs BOOLEAN NOT NULL,
-    friendly_with_cats BOOLEAN NOT NULL,
-    friendly_with_kids BOOLEAN NOT NULL,
-    microchipped BOOLEAN NOT NULL,
-    purebred BOOLEAN NOT NULL,
-    pet_nursery_name VARCHAR(255) NOT NULL
 );

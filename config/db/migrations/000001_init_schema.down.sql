@@ -4,4 +4,4 @@ DROP TABLE IF EXISTS specialties;
 DROP TABLE IF EXISTS doctor;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS booking;
-DROP TABLE IF EXISTS additional;
+DROP TABLE IF EXISTS additionals;
